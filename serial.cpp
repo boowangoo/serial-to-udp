@@ -1,11 +1,18 @@
 #include "serial.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h> // needed for memset
+
 Serial::Serial() {
     wholeMsg = false;
     c = 'D';
     
     // config termios
-    memset(&tio, 0, sizeof(tio));
+    bzero(&tio, sizeof(tio));
+    // memset(&tio, 0, sizeof(tio));
     tio.c_iflag = 0;
     tio.c_oflag = 0;
     tio.c_cflag = CS8|CREAD|CLOCAL;           // 8n1, see termios.h for more information
@@ -18,7 +25,7 @@ Serial::~Serial() {
     close(tty);
 }
 
-void Serial::tty_init(char* ttyfile, speed_t baud) {
+void Serial::tty_init(const char* ttyfile, const speed_t &baud) {
     tty = open(ttyfile, O_RDONLY | O_NONBLOCK);        // O_NONBLOCK might override VMIN and VTIME, so read() may return immediately.
     cfsetospeed(&tio, baud);
     cfsetispeed(&tio, baud);
@@ -26,7 +33,7 @@ void Serial::tty_init(char* ttyfile, speed_t baud) {
     tcsetattr(tty, TCSANOW, &tio);
 }
 
-char* Serial::readMsg() {
+std::string Serial::readMsg() {
     msg.clear();
 
     while (!wholeMsg) {
@@ -37,8 +44,7 @@ char* Serial::readMsg() {
             msg.append(&c, 1);
         }
     }
-
-    return (char*)msg.c_str();
+    return msg;
 }
 
 // bool Serial::isWholeMsg() {

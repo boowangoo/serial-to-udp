@@ -1,10 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <termios.h>
-#include <string.h> // needed for memset
-#include <string> // needed for memset
+#include <string>
 
 class Serial {
 private:
@@ -17,7 +12,7 @@ private:
 public:
 	Serial();
 	~Serial();
-	void tty_init(char* ttyfile, speed_t baud);
-	char* readMsg();
+	void tty_init(const char* ttyfile, const speed_t &baud);
+	std::string readMsg();
 	// bool isWholeMsg();
 };
